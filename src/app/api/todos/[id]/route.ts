@@ -39,15 +39,11 @@ const putSchema = yup.object({
 
 export async function PUT(request: Request, { params }: Segments ) { 
 
-  const { id } = params || '';
-
-  const todo = await prisma.todo.findFirst({
-    where: { id },
-  });
+  const todo = await getTodo( params.id );
 
   if ( !todo ) {
     return NextResponse.json({
-      message: `Todo with id ${ id } not found`
+      message: `Todo with id ${ params.id } not found`
     },{
       status: 404
     })
@@ -57,7 +53,7 @@ export async function PUT(request: Request, { params }: Segments ) {
     const { description, complete } = await putSchema.validate( await request.json() );
   
     const updatedTodo = await prisma.todo.update({ 
-      where: { id }, 
+      where: { id: params.id }, 
       data: { description, complete }
     })
   
